@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:full_stack_app/database/database.dart';
+import 'package:full_stack_app/helpers/constant.dart';
+import 'package:full_stack_app/helpers/general.dart';
+import 'package:full_stack_app/models/dog.dart';
+import 'package:full_stack_app/views/widgets/dog/dog_view_list.dart';
 
 class DrawerMenu extends StatelessWidget {
   const DrawerMenu({super.key});
@@ -24,11 +29,32 @@ class DrawerMenu extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
               child: ListTile(
                 leading: const Icon(
+                  Icons.pets,
+                  color: Colors.white,
+                ),
+                title: const Text(
+                  DrawerConstants.crudDog,
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  fetchDogsAndNavigate(context);
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: const BorderSide(
+                      width: 0.5,
+                      color: Colors.white,
+                    )),
+              )),
+          Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              child: ListTile(
+                leading: const Icon(
                   Icons.logout,
                   color: Colors.white,
                 ),
                 title: const Text(
-                  'Cerrar Sesión',
+                  SingInFormConstants.logout,
                   style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
@@ -41,9 +67,17 @@ class DrawerMenu extends StatelessWidget {
                       width: 0.5,
                       color: Colors.white,
                     )),
-              ))
+              )),
         ],
       ),
     );
+  }
+
+  void fetchDogsAndNavigate(BuildContext context) async {
+    final dogs = await Dog.fetchAll();
+    Route<dynamic> route = MaterialPageRoute<dynamic>(
+        builder: (context) => DogViewList(dogs: dogs));
+    Navigator.pop(context);
+    await Navigator.push(context, route);
   }
 }

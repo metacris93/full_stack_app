@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:full_stack_app/helpers/constant.dart';
-import 'package:full_stack_app/http/location_api.dart';
 import 'package:full_stack_app/views/widgets/snackbar.dart';
 
 class LoginView extends StatefulWidget {

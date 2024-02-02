@@ -5,7 +5,8 @@ import 'package:full_stack_app/views/widgets/home_app.dart';
 import 'package:full_stack_app/views/widgets/login_view_app.dart';
 import 'package:full_stack_app/views/widgets/splash_app.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
