@@ -78,10 +78,16 @@ class _CreateDogViewState extends State<CreateDogView> {
                     textStyle:
                         const TextStyle(fontSize: 21, color: Colors.white),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState?.validate() ?? false) {
                       _newDog();
-                      fetchDogsAndNavigate(context);
+                      final dogs = await Dog.fetchAll();
+                      Route<dynamic> route = MaterialPageRoute<dynamic>(
+                          builder: (context) => DogViewList(dogs: dogs));
+                      if (context.mounted) {
+                        Navigator.of(context).pop(context);
+                        Navigator.push(context, route);
+                      }
                     } else {
                       showError(SingInFormConstants.loginErrors);
                     }
@@ -96,13 +102,5 @@ class _CreateDogViewState extends State<CreateDogView> {
 
   Future<void> _newDog() async {
     await Dog.insert(Dog(name: _name.text, age: int.parse(_age.text)));
-  }
-
-  void fetchDogsAndNavigate(BuildContext context) async {
-    final dogs = await Dog.fetchAll();
-    Route<dynamic> route = MaterialPageRoute<dynamic>(
-        builder: (context) => DogViewList(dogs: dogs));
-    Navigator.pop(context);
-    await Navigator.push(context, route);
   }
 }

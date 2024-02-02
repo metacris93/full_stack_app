@@ -42,6 +42,40 @@ class Dog {
     });
   }
 
+  static Future<Dog> fetchById(int id) async {
+    final db = await DBProvider.instance.database;
+    final List<Map<String, dynamic>> maps =
+        await db.query('dogs', where: 'id = ?', whereArgs: [id]);
+    final dog = maps.length == 1
+        ? Dog(
+            id: maps[0]['id'] as int,
+            name: maps[0]['name'] as String,
+            age: maps[0]['age'] as int,
+          )
+        : throw Exception('Dog not found');
+    return dog;
+  }
+
+  static Future<void> update(Dog dog) async {
+    final db = await DBProvider.instance.database;
+    await db.update(
+      'dogs',
+      dog.toJson(),
+      where: 'id = ?',
+      whereArgs: [dog.id],
+    );
+  }
+
+  static Future<bool> delete(int id) async {
+    final db = await DBProvider.instance.database;
+    int count = await db.delete(
+      'dogs',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    return count > 0;
+  }
+
   @override
   String toString() {
     return 'Dog{id: $id, name: $name, age: $age}';

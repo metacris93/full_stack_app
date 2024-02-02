@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
 import 'package:full_stack_app/helpers/navigator_global.dart';
 import 'package:full_stack_app/helpers/snackbar_global.dart';
 import 'package:full_stack_app/views/widgets/home_app.dart';
 import 'package:full_stack_app/views/widgets/login_view_app.dart';
 import 'package:full_stack_app/views/widgets/splash_app.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }

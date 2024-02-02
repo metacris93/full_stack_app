@@ -25,4 +25,5 @@ abstract class DrawerConstants {
 abstract class GeneralConstants {
   static const String loading = 'Cargando...';
   static const String save = 'Registrar';
+  static const String update = 'Actualizar';
 }
