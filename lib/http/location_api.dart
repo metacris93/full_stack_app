@@ -6,8 +6,8 @@ import 'package:http/http.dart' as http;
 
 class LocationApi {
   Future<List<Location>> fetchLocation() async {
-    var uri = Endpoint.uri('locations');
-    final res = await http.get(uri);
+    var url = Endpoint.uri('locations');
+    final res = await http.get(url);
     if (res.statusCode != 200) {
       throw res.body;
     }

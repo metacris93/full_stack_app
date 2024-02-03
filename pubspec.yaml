@@ -43,6 +43,7 @@ dependencies:
   sqflite: "2.3.0"
   path_provider: "2.1.2"
   path: "1.8.3"
+  device_info_plus: "9.1.0"
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +73,7 @@ flutter:
   assets:
     - assets/images/logo.png
     - assets/images/
+    - assets/ca/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

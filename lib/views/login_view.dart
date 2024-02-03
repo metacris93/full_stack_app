@@ -128,7 +128,7 @@ class _LoginViewState extends State<LoginView> {
 
   void _login() async {
     _loading(true);
-    await Future.delayed(const Duration(seconds: 4), () {
+    await Future.delayed(const Duration(seconds: 2), () {
       _loading(false);
       Navigator.pushReplacementNamed(context, 'home');
     });

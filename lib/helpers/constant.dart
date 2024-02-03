@@ -20,6 +20,7 @@ abstract class CreateDogFormConstants {
 
 abstract class DrawerConstants {
   static const String crudDog = 'Dogs';
+  static const String locations = 'Ubicaciones';
 }
 
 abstract class GeneralConstants {
