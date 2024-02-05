@@ -1,6 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:full_stack_app/database/dao/user_dao.dart';
+import 'package:full_stack_app/database/database.dart';
+import 'package:full_stack_app/database/repositories/user_repository.dart';
+import 'package:full_stack_app/helpers/provider_global.dart';
 import 'package:full_stack_app/http/api_response.dart';
 import 'package:full_stack_app/http/backend_api.dart';
 import 'package:full_stack_app/http/backend_endpoint.dart';
@@ -9,22 +14,27 @@ import 'package:full_stack_app/models/user_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'login_test.mocks.dart';
 
 @GenerateMocks([http.Client])
-void main() {
+void main() async {
+  // TestWidgetsFlutterBinding.ensureInitialized();
+
   late MockClient client;
   late BackendApi backendApi;
   late Uri uriSignIn;
   late Login loginData;
 
-  setUp(() {
+  setUpAll(() async {
+    sqfliteFfiInit();
     client = MockClient();
     backendApi = BackendApi(httpClient: client);
     uriSignIn = BackendEndpoint.uri('login');
     loginData = Login(username: 'user_test', password: 'password');
   });
+
   group('USER AUTHENTICATION FUNCTIONS', () {
     test('User can sign in', () async {
       const jsonString = """
@@ -55,8 +65,33 @@ void main() {
       expect(result.data!.name, apiResponse.data!.name);
       expect(result.data!.username, apiResponse.data!.username);
       expect(result.data!.email, apiResponse.data!.email);
-      expect(result.data!.apiToken, apiResponse.data!.apiToken);
+      expect(result.data!.token, apiResponse.data!.token);
       verify(client.post(uriSignIn, body: jsonEncode(loginData.toJson())));
+    });
+    test('It can save user on database', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      final db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+      await db.execute(UserDao().createTableQuery);
+
+      DBProvider.instance.setDatabase(db);
+      final container = ProviderContainer(overrides: [
+        databaseProvider.overrideWithValue(DBProvider.instance),
+        // userRepositoryProvider
+        //     .overrideWithValue(UserRepository(dbProvider: DBProvider.instance)),
+      ]);
+
+      final userRepository = container.read(userRepositoryProvider);
+      final user = UserSignIn(
+        username: 'test_username',
+        name: 'test_name',
+        email: 'test_email',
+        token: 'test_token',
+      );
+      await userRepository.insert(user);
+      var userRegistered = await userRepository.fetchById(1);
+      expect(userRegistered.username, user.username);
+
+      await db.close();
     });
   });
 }

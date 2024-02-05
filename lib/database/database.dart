@@ -18,6 +18,10 @@ class DBProvider {
     return _database!;
   }
 
+  void setDatabase(Database database) {
+    _database = database;
+  }
+
   _initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, 'full_stack_database.db');
