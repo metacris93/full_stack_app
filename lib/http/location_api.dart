@@ -2,12 +2,16 @@ import 'dart:convert';
 
 import 'package:full_stack_app/http/location_endpoint.dart';
 import 'package:full_stack_app/models/location.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 class LocationApi {
+  final Client httpClient;
+
+  LocationApi({required this.httpClient});
+
   Future<List<Location>> fetchLocation() async {
     var url = LocationEndpoint.uri('locations');
-    final res = await http.get(url);
+    final res = await httpClient.get(url);
     if (res.statusCode != 200) {
       throw res.body;
     }

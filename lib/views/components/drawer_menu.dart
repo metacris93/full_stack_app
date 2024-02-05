@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:full_stack_app/database/database.dart';
 import 'package:full_stack_app/helpers/constant.dart';
 import 'package:full_stack_app/helpers/general.dart';
 import 'package:full_stack_app/helpers/network.dart';
+import 'package:full_stack_app/helpers/provider_global.dart';
 // import 'package:full_stack_app/helpers/general.dart';
 import 'package:full_stack_app/http/location_api.dart';
 import 'package:full_stack_app/models/dog.dart';
 import 'package:full_stack_app/views/widgets/dog/dog_view_list.dart';
 import 'package:full_stack_app/views/widgets/location/location_view_list.dart';
 import 'package:full_stack_app/views/widgets/snackbar.dart';
+import 'package:http/http.dart';
 
-class DrawerMenu extends StatelessWidget {
+class DrawerMenu extends ConsumerWidget {
   const DrawerMenu({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Drawer(
       surfaceTintColor: Theme.of(context).primaryColor,
       backgroundColor: Theme.of(context).primaryColor,
@@ -64,7 +67,8 @@ class DrawerMenu extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                  fetchLocationsAndNavigate(context);
+                  fetchLocationsAndNavigate(
+                      context, ref.watch(httpClientProvider));
                 },
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -108,13 +112,14 @@ class DrawerMenu extends StatelessWidget {
     Navigator.push(context, route);
   }
 
-  Future<void> fetchLocationsAndNavigate(BuildContext context) async {
+  Future<void> fetchLocationsAndNavigate(
+      BuildContext context, Client httpClient) async {
     try {
       if (!(await Network.isConnected())) {
         showError(SingInFormConstants.loginErrors);
         return;
       }
-      LocationApi locationApi = LocationApi();
+      LocationApi locationApi = LocationApi(httpClient: httpClient);
       final locations = await locationApi.fetchLocation();
       Route<dynamic> route = MaterialPageRoute<dynamic>(
           builder: (context) => LocationViewList(locations: locations));
