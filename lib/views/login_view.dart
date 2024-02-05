@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:full_stack_app/helpers/constant.dart';
+import 'package:full_stack_app/http/backend_api.dart';
 import 'package:full_stack_app/views/widgets/snackbar.dart';
 
 class LoginView extends StatefulWidget {
@@ -132,6 +133,16 @@ class _LoginViewState extends State<LoginView> {
       _loading(false);
       Navigator.pushReplacementNamed(context, 'home');
     });
+    // try {
+    //   BackendApi backendApi = BackendApi();
+    //   var res = await backendApi.fetchAppInfo();
+    //   if (!context.mounted) return;
+    //   Navigator.pushReplacementNamed(context, 'home');
+    // } catch (ex, stackTrace) {
+    //   showError('${ex.toString()} ${stackTrace.toString()}');
+    // } finally {
+    //   _loading(false);
+    // }
   }
   /*void _login() async {
     setState(() {

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:full_stack_app/database/database.dart';
+// import 'package:full_stack_app/database/database.dart';
 import 'package:full_stack_app/helpers/constant.dart';
 import 'package:full_stack_app/helpers/general.dart';
+import 'package:full_stack_app/helpers/network.dart';
+// import 'package:full_stack_app/helpers/general.dart';
 import 'package:full_stack_app/http/location_api.dart';
 import 'package:full_stack_app/models/dog.dart';
 import 'package:full_stack_app/views/widgets/dog/dog_view_list.dart';
 import 'package:full_stack_app/views/widgets/location/location_view_list.dart';
+import 'package:full_stack_app/views/widgets/snackbar.dart';
 
 class DrawerMenu extends StatelessWidget {
   const DrawerMenu({super.key});
@@ -81,9 +84,8 @@ class DrawerMenu extends StatelessWidget {
                   SingInFormConstants.logout,
                   style: TextStyle(color: Colors.white),
                 ),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
+                onTap: () async {
+                  await replacementToRouteNamed(false, 'login', context);
                 },
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -101,29 +103,25 @@ class DrawerMenu extends StatelessWidget {
     final dogs = await Dog.fetchAll();
     Route<dynamic> route = MaterialPageRoute<dynamic>(
         builder: (context) => DogViewList(dogs: dogs));
-    if (context.mounted) {
-      Navigator.of(context).pop(context);
-      Navigator.push(context, route);
-    }
+    if (!context.mounted) return;
+    Navigator.of(context).pop(context);
+    Navigator.push(context, route);
   }
 
-  void fetchLocationsAndNavigate(BuildContext context) async {
+  Future<void> fetchLocationsAndNavigate(BuildContext context) async {
     try {
-      print('**** 1 ****');
+      if (!(await Network.isConnected())) {
+        showError(SingInFormConstants.loginErrors);
+        return;
+      }
       LocationApi locationApi = LocationApi();
-      print('**** 1.5 ****');
       final locations = await locationApi.fetchLocation();
-      print('**** 1.6 **** ${locations.length}');
       Route<dynamic> route = MaterialPageRoute<dynamic>(
           builder: (context) => LocationViewList(locations: locations));
-      print('**** 2 ****');
-      if (context.mounted) {
-        Navigator.of(context).pop(context);
-        print('**** 3 ****');
-        Navigator.push(context, route);
-      }
+      if (!context.mounted) return;
+      Navigator.of(context).pop(context);
+      Navigator.push(context, route);
     } catch (ex, stackTrace) {
-      print('**** EXCEPTION ****');
       Fluttertoast.showToast(
           msg: '${ex.toString()} ${stackTrace.toString()}',
           toastLength: Toast.LENGTH_SHORT,

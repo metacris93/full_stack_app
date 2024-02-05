@@ -10,12 +10,13 @@ class ApiResponse<T> {
       required this.errors,
       this.data});
 
-  factory ApiResponse.fromJson(Map<String, dynamic> json) {
-    return ApiResponse(
+  factory ApiResponse.fromJson(Map<String, dynamic> json,
+      T Function(Map<String, dynamic> json) fromJsonT) {
+    return ApiResponse<T>(
       succeeded: json['succeeded'],
       message: json['message'],
       errors: List<String>.from(json['errors']),
-      data: json['data'] as T?,
+      data: fromJsonT(json['data']),
     );
   }
 
@@ -26,5 +27,10 @@ class ApiResponse<T> {
       'errors': errors,
       'data': data,
     };
+  }
+
+  @override
+  String toString() {
+    return 'ApiResponse{succeeded: $succeeded, message: $message, errors: $errors, data: ${data?.toString()}}';
   }
 }
