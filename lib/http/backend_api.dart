@@ -15,7 +15,11 @@ class BackendApi {
   Future<ApiResponse<UserSignIn>> login(Login login) async {
     Map<String, dynamic> data = login.toJson();
     var url = BackendEndpoint.uri('login');
-    final res = await httpClient.post(url, body: jsonEncode(data));
+    final res = await httpClient.post(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(data));
     if (res.statusCode != 200) {
       throw res.body;
     }

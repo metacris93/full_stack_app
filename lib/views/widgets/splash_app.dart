@@ -1,19 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:full_stack_app/helpers/provider_global.dart';
+import 'package:full_stack_app/views/widgets/snackbar.dart';
 
-class SplashApp extends StatefulWidget {
+class SplashApp extends ConsumerStatefulWidget {
   const SplashApp({Key? key}) : super(key: key);
 
   @override
-  State<SplashApp> createState() => _SplashScreenState();
+  ConsumerState<SplashApp> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashApp> {
+class _SplashScreenState extends ConsumerState<SplashApp> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 4), () {
-      Navigator.pushReplacementNamed(context, 'login');
-    });
+  }
+
+  Future<void> _startApp() async {
+    try {
+      var userRepository = ref.watch(userRepositoryProvider);
+      var user = await userRepository.getCurrentUser();
+      if (user == null) {
+        if (!context.mounted) return;
+        Navigator.pushReplacementNamed(context, 'login');
+      } else {
+        if (!context.mounted) return;
+        Navigator.pushReplacementNamed(context, 'home');
+      }
+    } catch (ex, stackTrace) {
+      showError('${ex.toString()} ${stackTrace.toString()}');
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _startApp();
   }
 
   @override

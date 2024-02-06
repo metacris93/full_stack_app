@@ -9,7 +9,6 @@ import 'package:full_stack_app/app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await customCertificateOldDevices();
-  // runApp(const MyApp());
   runApp(const ProviderScope(child: MyApp()));
 }
 

@@ -6,19 +6,31 @@ import 'package:full_stack_app/helpers/constant.dart';
 import 'package:full_stack_app/helpers/general.dart';
 import 'package:full_stack_app/helpers/network.dart';
 import 'package:full_stack_app/helpers/provider_global.dart';
-// import 'package:full_stack_app/helpers/general.dart';
 import 'package:full_stack_app/http/location_api.dart';
 import 'package:full_stack_app/models/dog.dart';
+import 'package:full_stack_app/models/user_sign_in.dart';
 import 'package:full_stack_app/views/widgets/dog/dog_view_list.dart';
 import 'package:full_stack_app/views/widgets/location/location_view_list.dart';
 import 'package:full_stack_app/views/widgets/snackbar.dart';
 import 'package:http/http.dart';
+
+final appNameProvider = FutureProvider<UserSignIn?>((ref) async {
+  final dbProvider = ref.watch(databaseProvider);
+  final db = await dbProvider.database;
+  List<Map<String, dynamic>> users = await db.rawQuery('SELECT * FROM users');
+  if (users.isNotEmpty) {
+    return UserSignIn.fromStorage(users.first);
+  }
+  return null;
+});
 
 class DrawerMenu extends ConsumerWidget {
   const DrawerMenu({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final appNameAsyncValue = ref.watch(appNameProvider);
+    final userRepository = ref.read(userRepositoryProvider);
     return Drawer(
       surfaceTintColor: Theme.of(context).primaryColor,
       backgroundColor: Theme.of(context).primaryColor,
@@ -26,13 +38,31 @@ class DrawerMenu extends ConsumerWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
+          DrawerHeader(
+            decoration: const BoxDecoration(
                 image: DecorationImage(
               image: AssetImage('assets/images/logo.png'),
               fit: BoxFit.contain,
             )),
-            child: Text(''),
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: appNameAsyncValue.when(
+                      data: (value) => Text(
+                            value?.name ?? 'Desconocido',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 20),
+                            textAlign: TextAlign.center,
+                          ),
+                      error: (err, stack) {
+                        showError(err.toString());
+                        return Text('Error: $err');
+                      },
+                      loading: () => const CircularProgressIndicator()),
+                ),
+              ],
+            ),
           ),
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
@@ -89,6 +119,8 @@ class DrawerMenu extends ConsumerWidget {
                   style: TextStyle(color: Colors.white),
                 ),
                 onTap: () async {
+                  await userRepository.deleteAll();
+                  if (!context.mounted) return;
                   await replacementToRouteNamed(false, 'login', context);
                 },
                 shape: RoundedRectangleBorder(

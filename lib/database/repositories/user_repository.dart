@@ -27,4 +27,19 @@ class UserRepository {
         : throw Exception('User not found');
     return user;
   }
+
+  Future<UserSignIn?> getCurrentUser() async {
+    final db = await dbProvider.database;
+    List<Map<String, dynamic>> users = await db.rawQuery('SELECT * FROM users');
+    if (users.isNotEmpty) {
+      return UserSignIn.fromStorage(users.first);
+    }
+    return null;
+  }
+
+  Future<int> deleteAll() async {
+    final db = await dbProvider.database;
+    var res = await db.delete("users");
+    return res;
+  }
 }

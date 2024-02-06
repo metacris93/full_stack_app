@@ -20,7 +20,7 @@ import 'login_test.mocks.dart';
 
 @GenerateMocks([http.Client])
 void main() async {
-  // TestWidgetsFlutterBinding.ensureInitialized();
+  TestWidgetsFlutterBinding.ensureInitialized();
 
   late MockClient client;
   late BackendApi backendApi;
@@ -69,15 +69,12 @@ void main() async {
       verify(client.post(uriSignIn, body: jsonEncode(loginData.toJson())));
     });
     test('It can save user on database', () async {
-      TestWidgetsFlutterBinding.ensureInitialized();
       final db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
       await db.execute(UserDao().createTableQuery);
 
       DBProvider.instance.setDatabase(db);
       final container = ProviderContainer(overrides: [
         databaseProvider.overrideWithValue(DBProvider.instance),
-        // userRepositoryProvider
-        //     .overrideWithValue(UserRepository(dbProvider: DBProvider.instance)),
       ]);
 
       final userRepository = container.read(userRepositoryProvider);

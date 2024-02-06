@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:full_stack_app/helpers/constant.dart';
+import 'package:full_stack_app/helpers/provider_global.dart';
+import 'package:full_stack_app/http/api_response.dart';
+import 'package:full_stack_app/http/backend_api.dart';
+import 'package:full_stack_app/models/login.dart';
+import 'package:full_stack_app/models/user_sign_in.dart';
 import 'package:full_stack_app/views/widgets/snackbar.dart';
 
-class LoginView extends StatefulWidget {
+class LoginView extends ConsumerStatefulWidget {
   const LoginView({Key? key}) : super(key: key);
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  ConsumerState<LoginView> createState() => _LoginViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _LoginViewState extends ConsumerState<LoginView> {
   bool _isLoading = false;
   final TextEditingController _username = TextEditingController();
   final TextEditingController _password = TextEditingController();
@@ -59,9 +65,12 @@ class _LoginViewState extends State<LoginView> {
             foregroundColor: Colors.white,
             textStyle: const TextStyle(fontSize: 21, color: Colors.white),
           ),
-          onPressed: () {
+          onPressed: () async {
             if (_formKey.currentState?.validate() ?? false) {
-              _login();
+              var userLoggedIn = await _login();
+              if (userLoggedIn != null && userLoggedIn.data != null) {
+                _registerUserLoggedIn(userLoggedIn.data!);
+              }
             } else {
               showError(SingInFormConstants.loginErrors);
             }
@@ -126,48 +135,25 @@ class _LoginViewState extends State<LoginView> {
     });
   }
 
-  void _login() async {
+  Future<ApiResponse<UserSignIn>?> _login() async {
+    var httpClient = ref.watch(httpClientProvider);
     _loading(true);
-    await Future.delayed(const Duration(seconds: 2), () {
-      _loading(false);
-      Navigator.pushReplacementNamed(context, 'home');
-    });
-    // try {
-    //   BackendApi backendApi = BackendApi();
-    //   var res = await backendApi.fetchAppInfo();
-    //   if (!context.mounted) return;
-    //   Navigator.pushReplacementNamed(context, 'home');
-    // } catch (ex, stackTrace) {
-    //   showError('${ex.toString()} ${stackTrace.toString()}');
-    // } finally {
-    //   _loading(false);
-    // }
-  }
-  /*void _login() async {
-    setState(() {
-      _isLoading = true;
-    });
     try {
-      LocationApi locationApi = LocationApi();
-      var res = await locationApi.fetchLocation();
-      for (var location in res) {
-        print('****************');
-        print(location);
-        print('****************');
-      }
+      BackendApi backendApi = BackendApi(httpClient: httpClient);
+      var login = Login(username: _username.text, password: _password.text);
+      return await backendApi.login(login);
     } catch (ex, stackTrace) {
-      Fluttertoast.showToast(
-          msg: '${ex.toString()} ${stackTrace.toString()}',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      showError('${ex.toString()} ${stackTrace.toString()}');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      _loading(false);
     }
-  }*/
+    return null;
+  }
+
+  void _registerUserLoggedIn(UserSignIn user) async {
+    var userRepository = ref.watch(userRepositoryProvider);
+    await userRepository.insert(user);
+    if (!context.mounted) return;
+    Navigator.pushReplacementNamed(context, 'home');
+  }
 }
