@@ -20,6 +20,15 @@ class ApiResponse<T> {
     );
   }
 
+  factory ApiResponse.fromJsonWithoutData(Map<String, dynamic> json) {
+    return ApiResponse(
+      succeeded: json['succeeded'],
+      message: json['message'],
+      errors: List<String>.from(json['errors']),
+      data: json['data'],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'succeeded': succeeded,

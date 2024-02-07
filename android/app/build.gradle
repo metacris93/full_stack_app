@@ -24,8 +24,8 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.full_stack_app"
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    compileSdkVersion 34
+    // ndkVersion flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -50,6 +50,12 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        // Replace this with the value to use for android:foregroundServiceType
+        // eg 'camera', 'connectedDevice', 'location', etc
+        // manifestPlaceholders['foregroundServiceType'] = 'connectedDevice'
+        // manifestPlaceholders['foregroundServiceType'] = 'dataSync'
+        // manifestPlaceholders['foregroundServiceType'] = 'location'
     }
 
     buildTypes {

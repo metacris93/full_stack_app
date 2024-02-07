@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:full_stack_app/models/user_sign_in.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -30,6 +31,15 @@ class DBProvider {
       version: versionDB,
       onCreate: _onCreate,
     );
+  }
+
+  Future<UserSignIn?> getCurrentUser() async {
+    final db = await database;
+    List<Map<String, dynamic>> users = await db.rawQuery('SELECT * FROM users');
+    if (users.isNotEmpty) {
+      return UserSignIn.fromStorage(users.first);
+    }
+    return null;
   }
 
   _onCreate(Database db, int version) async {
