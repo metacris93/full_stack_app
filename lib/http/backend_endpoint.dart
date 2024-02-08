@@ -1,6 +1,6 @@
 class BackendEndpoint {
   static const apiScheme = 'https';
-  static const apiHost = 'db02-157-100-104-67.ngrok-free.app';
+  static const apiHost = 'a5d2-157-100-104-67.ngrok-free.app';
   static const prefix = '/api/v1/';
 
   static Uri uri(String path, {Map<String, dynamic>? queryParameters}) {

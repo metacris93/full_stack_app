@@ -26,8 +26,8 @@ Future<void> initializeService() async {
       autoStart: true,
       isForegroundMode: true,
       notificationChannelId: channel.id,
-      initialNotificationTitle: 'Servicio foreground',
-      initialNotificationContent: 'Initializing',
+      initialNotificationTitle: 'Foreground Service',
+      initialNotificationContent: 'Initializing...',
       foregroundServiceNotificationId: notificationId,
     ),
     iosConfiguration: IosConfiguration(

@@ -1,17 +1,21 @@
 import 'dart:convert';
 
 import 'package:full_stack_app/database/repositories/user_repository.dart';
-import 'package:full_stack_app/helpers/general.dart';
 import 'package:full_stack_app/http/api_response.dart';
 import 'package:full_stack_app/http/backend_endpoint.dart';
 import 'package:full_stack_app/models/user_location.dart';
-import 'package:http/http.dart';
+import 'package:http_interceptor/http_interceptor.dart';
 
 class LocationApiService {
-  final Client httpClient;
+  final Client? httpClient;
+  List<InterceptorContract> interceptors;
   final UserRepository userRepository;
 
-  LocationApiService({required this.httpClient, required this.userRepository});
+  LocationApiService(
+      {required this.userRepository,
+      this.httpClient,
+      List<InterceptorContract>? interceptors})
+      : interceptors = interceptors ?? [];
 
   Future<ApiResponse<Map<String, dynamic>?>> saveCurrentLocation(
       UserLocation userLocation) async {
@@ -20,10 +24,15 @@ class LocationApiService {
     if (user == null) {
       throw 'User not found';
     }
-    final res = await httpClient.post(
-      url,
-      body: jsonEncode(userLocation.toJson()),
-    );
+    Response res;
+    if (httpClient != null) {
+      res =
+          await httpClient!.post(url, body: jsonEncode(userLocation.toJson()));
+    } else {
+      var httpInterceptor = InterceptedHttp.build(interceptors: interceptors);
+      res = await httpInterceptor.post(url,
+          body: jsonEncode(userLocation.toJson()));
+    }
     if (res.statusCode != 200) {
       throw res.body;
     }

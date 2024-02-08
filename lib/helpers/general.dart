@@ -43,7 +43,8 @@ Future<Position> getCurrentLocation() async {
         'Los permisos de ubicación están permanentemente denegados, no podemos solicitar permisos.');
   }
 
-  return await Geolocator.getCurrentPosition();
+  return await Geolocator.getCurrentPosition(
+      timeLimit: const Duration(seconds: 20));
 }
 
 Map<String, String> getAuthenticationHeader(UserSignIn user) {
